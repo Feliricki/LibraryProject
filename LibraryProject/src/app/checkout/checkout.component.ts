@@ -1,4 +1,4 @@
-import { Component, OnInit, Signal } from '@angular/core';
+import { Component, OnInit, WritableSignal, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from "../auth/authentication.service";
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
@@ -30,6 +30,8 @@ export class CheckoutComponent implements OnInit {
     title: this.formBuilder.nonNullable.control(""),
     description: this.formBuilder.nonNullable.control(""),
   });
+
+  finishedLoading: boolean = false;
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -99,6 +101,7 @@ export class CheckoutComponent implements OnInit {
       .subscribe({
         next: changes => {
           console.log(`Made successful deletion with ${changes} changes`);
+          location.reload();
         },
         error: err => {
           console.error(err);
@@ -118,10 +121,12 @@ export class CheckoutComponent implements OnInit {
           this.title = "Edit - " + this.book.title;
           this.Title.setValue(this.book.title);
           this.Description.setValue(this.book?.description);
+          this.finishedLoading = true;
         },
         error: err => {
           console.error(err);
-        }
+          this.finishedLoading = true;
+        },
       })
   }
 }

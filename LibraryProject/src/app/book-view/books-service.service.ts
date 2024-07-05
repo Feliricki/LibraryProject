@@ -35,14 +35,14 @@ export class BooksServiceService {
   deleteBook(isbn: number): Observable<number> {
     let url = environment.baseUrl + "api/Books/RemoveBook";
     let params = new HttpParams()
-      .set("isbn", isbn);
+      .set("isbn", isbn.toString());
 
     return this.http.delete<number>(url,  { params: params });
   }
 
   addBook(book: BooksDto){
     let url = environment.baseUrl + "api/Books/AddBook";
-    return this.http.post<number>(url, { body: JSON.stringify(book) });
+    return this.http.post<number>(url, book);
   }
 
   getFeaturedBooks(numFeatured: number): Observable<BooksDto[]> {

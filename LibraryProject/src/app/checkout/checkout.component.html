@@ -1,27 +1,32 @@
 <div class="editContainer">
 
-  @if (!book){
-    <em>Loading ...</em>
-  } @else {
+  @if (book === undefined){
+    @if (finishedLoading){
+      <p>Book not found</p>
+    }@else {
+      <em>Loading ...</em>
+    }
+  }
+  @else {
 
     <mat-list>
 
       <mat-list-item>
         <img matListItemAvatar [src]="book.bookCoverUrl">
-        <h4 matListItemTitle>Title: {{book.title}}</h4>
+        <h4 matListItemTitle>Title: {{ book.title }}</h4>
 
         <p matListItemLine>
-          Description: {{book.description}}
+          Description: {{ book.description }}
         </p>
 
         <p matListItemLine>
-          Author: {{book.author}}
+          Author: {{ book.author }}
         </p>
         <p matListItemLine>
-          Publisher : {{book.publisher}}
+          Publisher : {{ book.publisher }}
         </p>
         <p matListItemLine>
-          Publication Date: {{book.publicationDate | date:"fullDate"}}
+          Publication Date: {{ book.publicationDate | date:"fullDate" }}
         </p>
         <p matListItemLine>
           Category: {{book.category}}
@@ -32,13 +37,15 @@
         <p matListItemLine>
           Page Count: {{book.pageCount}}
         </p>
-        @if (isAuthenticated() === true){
+
+        @if (isAuthenticated()){
           <button mat-flat-button matListItemLine (click)="setCheckoutStatus(true)">Checkout Book</button>
         }
-        @if (isLibrarian() === true){
+        @if (isLibrarian()){
           <br>
           <button mat-flat-button matListItemLine (click)="setCheckoutStatus(false)">Checkin Book</button>
         }
+
       </mat-list-item>
 
     </mat-list>
@@ -68,7 +75,7 @@
             <br>
 
             <button mat-flat-button (click)="submitEdit()" [disabled]="editForm.invalid">Submit Edit</button>
-            <button mat-flat-button class="remove-button">Remove Book</button>
+            <button mat-flat-button class="remove-button" (click)="deleteBook()">Remove Book</button>
           </mat-card-content>
 
 

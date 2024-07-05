@@ -128,7 +128,7 @@ namespace LibraryProjectAPI.Controllers
                     return BadRequest("Book was not found.");
                 }
                 _dbContext.Books.Remove(source);
-                var changes = _dbContext.SaveChangesAsync();
+                var changes = await _dbContext.SaveChangesAsync();
                 return Ok(changes);
 
             } catch (Exception)

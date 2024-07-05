@@ -28,6 +28,10 @@ namespace LibraryProjectAPI.Services
             await SeedDatabase();
         }
 
+        //private async Task CreateDatabase()
+        //{
+        //}
+
         private async Task SeedDatabase()
         {
             // NOTE: The isbn is unique for each book. This is used in place of the Id 

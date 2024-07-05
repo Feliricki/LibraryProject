@@ -92,6 +92,7 @@ export class BookViewComponent implements OnInit {
 
   addNewBook(){
     const today = new Date();
+    console.log(this.newBookForm);
     this.booksService.addBook({
       title: this.newBookForm.controls.title.value,
       bookCoverUrl: this.newBookForm.controls.bookCoverUrl.value,
@@ -107,7 +108,7 @@ export class BookViewComponent implements OnInit {
     }).subscribe({
       next: response =>{
         console.log("successfully added book");
-        this.router.navigate(["/"]);
+        location.reload();
       },
       error: err => {
         console.error(err);

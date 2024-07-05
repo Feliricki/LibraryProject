@@ -90,6 +90,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddHostedService<StartupService>();
+builder.Services.AddHostedService<DatabaseService>();
 
 var app = builder.Build();
 
