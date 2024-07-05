@@ -37,8 +37,10 @@ Make sure to replace "<YOUR_SQLEXPRESS_SERVER> with the name of your server.
 }
 ```
 
-Using your console application of choice, run the command "dotnet run" in the base directory of the LibraryProjectAPI project to run the backend server. Then navigate to the
-base directory of the angular project in LibraryProject and run "npm install" to install the required packages and then "ng serve" to start the frontend server.
+Running the project is best done by cloning the project from Visual Studio. Right click on the 'LibraryProject' project solution and click on 'Configure Start up'.
+Make sure to select "Multiple startup projects", set the action for both projects to 'Start', and have the LibraryProjectAPI project run first. 
+![setup](https://github.com/Feliricki/LibraryProject/assets/54556587/33b6dcb3-c7be-4b4d-8570-84252dc56de5)
+
 
 Assuming no issues, the user should see the following homepage 
 
@@ -52,7 +54,7 @@ The backend and the database is usually at first, so a refresh or two may be req
   "DefaultPassword" : "MySecretPassword123!"
 }
 ```
-However, at present anyone can sign up a librarian.
+However, at present anyone can sign up as librarian.
 
 Certain options are made unavailable to users not logged in. On the homepage the "Add book" tab and corresponding form is only available to user loggin in as a librarian. The frontend will make the option unavailable and the backend 
 server will reject users without the "Librarian" role. 
@@ -64,3 +66,5 @@ take you to the "EditComponent" however only librarians can actually edit a book
 On this page, any logged in user can checkout a book but only librarian can checkin or edit.
 
 In all in, only logged in users are able to make meaningful changes to the database.
+
+
