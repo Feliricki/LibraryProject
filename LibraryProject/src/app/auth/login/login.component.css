@@ -1,0 +1,19 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.login {
+  width: 400px;
+  min-width: 200px;
+
+  margin-top: 20vh;
+}
+
+.card-content {
+  margin-top: 1em;
+}
+
+mat-form-field {
+  width: 300px;
+}

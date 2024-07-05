@@ -1,0 +1,83 @@
+<div class="editContainer">
+
+  @if (!book){
+    <em>Loading ...</em>
+  } @else {
+
+    <mat-list>
+
+      <mat-list-item>
+        <img matListItemAvatar [src]="book.bookCoverUrl">
+        <h4 matListItemTitle>Title: {{book.title}}</h4>
+
+        <p matListItemLine>
+          Description: {{book.description}}
+        </p>
+
+        <p matListItemLine>
+          Author: {{book.author}}
+        </p>
+        <p matListItemLine>
+          Publisher : {{book.publisher}}
+        </p>
+        <p matListItemLine>
+          Publication Date: {{book.publicationDate | date:"fullDate"}}
+        </p>
+        <p matListItemLine>
+          Category: {{book.category}}
+        </p>
+        <p matListItemLine>
+          ISBN: {{book.isbn}}
+        </p>
+        <p matListItemLine>
+          Page Count: {{book.pageCount}}
+        </p>
+        @if (isAuthenticated() === true){
+          <button mat-flat-button matListItemLine (click)="setCheckoutStatus(true)">Checkout Book</button>
+        }
+        @if (isLibrarian() === true){
+          <br>
+          <button mat-flat-button matListItemLine (click)="setCheckoutStatus(false)">Checkin Book</button>
+        }
+      </mat-list-item>
+
+    </mat-list>
+
+    @if (isLibrarian() === true){
+      <div [formGroup]="editForm" class="form-container">
+
+        <mat-card>
+
+          <mat-card-title>
+            <h4>Edit Book:</h4>
+          </mat-card-title>
+
+          <mat-card-content>
+
+            <mat-form-field>
+              <mat-label>Edit Title: </mat-label>
+              <input matInput formControlName="title">
+            </mat-form-field>
+
+            <br>
+
+            <mat-form-field>
+              <mat-label>Edit: Description</mat-label>
+              <input matInput formControlName="description">
+            </mat-form-field>
+            <br>
+
+            <button mat-flat-button (click)="submitEdit()" [disabled]="editForm.invalid">Submit Edit</button>
+            <button mat-flat-button class="remove-button">Remove Book</button>
+          </mat-card-content>
+
+
+        </mat-card>
+
+      </div>
+    }
+
+
+  }
+
+</div>

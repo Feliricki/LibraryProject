@@ -1,0 +1,58 @@
+<div class="signupContainer">
+  <mat-card appearance="outlined" class="signup">
+    <mat-card-header>
+      <mat-card-title>Sign up</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="card-content">
+
+
+      <form [formGroup]="signupForm" (ngSubmit)="submitForm()">
+
+        <mat-form-field appearance="outline">
+          <mat-label>Username:</mat-label>
+          <input matInput formControlName="username" required>
+        </mat-form-field>
+        @if (Username.hasError("required")){
+          <mat-error>Username is required.</mat-error>
+        }
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email:</mat-label>
+          <input matInput formControlName="email" required>
+        </mat-form-field>
+        @if (Email.invalid){
+          <mat-error>Email is invalid.</mat-error>
+        }
+
+        <mat-form-field appearance="outline">
+          <mat-label>Password:</mat-label>
+          <input matInput [type]="hide ? 'password' : 'text'" formControlName="password" required>
+        </mat-form-field>
+
+        @if (Password.hasError("required")){
+          <mat-error>Password is required.</mat-error>
+        }
+
+        <p>
+          <mat-checkbox formControlName="isLibrarian">User is a librarian</mat-checkbox>
+        </p>
+
+        @if (signupResult && !signupResult.success){
+          <mat-error>
+            <strong>ERROR</strong>:{{signupResult.message}}
+          </mat-error>
+        }
+
+        <div>
+          <button class="submit-button" mat-flat-button color="primary" type="submit" [disabled]="signupForm.invalid">
+            Login
+          </button>
+          <button class="cancel-button" mat-button [routerLink]="['/']">
+            Cancel
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

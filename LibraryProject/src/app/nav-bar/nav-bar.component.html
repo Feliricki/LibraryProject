@@ -1,0 +1,23 @@
+<mat-toolbar class="toolbar">
+
+  <button mat-icon-button [routerLink]="['/']">
+    <mat-icon fontIcon="home"></mat-icon>
+  </button>
+
+  <span>
+    @if (isLibrarian()){
+      Logged in as librarian
+    } @else if (isAuthenticated()) {
+      Logged in as user
+    }
+  </span>
+
+  <span class="spacer"></span>
+
+  <button mat-button [routerLink]="['/login']" aria-label="Go to login page">Login</button>
+  <button mat-button [routerLink]="['/signup']" aria-label="Go to sign up page">Sign up</button>
+  @if (isAuthenticated()){
+    <button mat-button (click)="logout()" aria-label="log out">Log out</button>
+  }
+
+</mat-toolbar>
