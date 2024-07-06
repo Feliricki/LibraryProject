@@ -2,6 +2,7 @@
 
 namespace LibraryProjectAPI.DTO.Books
 {
+    // Not used
     public class CheckoutRequest
     {
         [JsonPropertyName("isbn")]

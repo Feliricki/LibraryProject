@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibraryProjectAPI.Models;
 
-// This table may go unused
+// This table goes unused.
 [Table("Reviews")]
 public class Reviews
 {

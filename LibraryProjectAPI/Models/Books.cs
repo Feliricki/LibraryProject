@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraryProjectAPI.Models;
 
+// Self explanatory
+// Indices are created to speed up performance 
+// when sorting by title, author, and availibility.
 [Table("Books")]
 [Index(nameof(Title), nameof(Author), nameof(Available))]
 public class Books

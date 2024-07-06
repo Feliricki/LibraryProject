@@ -7,6 +7,7 @@ using System.Text;
 
 namespace LibraryProjectAPI.Services
 {
+    // PURPOSE: This service groups some methods related to Jwt token creation.
     public class JwtService(IConfiguration configuration, UserManager<ApplicationUser> userManager)
     {
         private readonly IConfiguration _configuration = configuration;

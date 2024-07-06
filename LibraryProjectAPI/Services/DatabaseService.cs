@@ -2,6 +2,9 @@
 
 namespace LibraryProjectAPI.Services
 {
+
+    // PURPOSE: This worker is in charge of counting down the 
+    // "DaysUntilAvailable" field for each that is checked out.
     public class DatabaseService : IHostedService, IDisposable
     {
         readonly IServiceScopeFactory _scopeFactory;

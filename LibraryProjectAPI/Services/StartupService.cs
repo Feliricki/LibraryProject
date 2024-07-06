@@ -6,6 +6,8 @@ using Bogus;
 
 namespace LibraryProjectAPI.Services
 {
+    // PURPOSE: This background service creates the tables and entities required by the application.
+    // Then the database is seeded with dummy data.
     public class StartupService : IHostedService
     {
         private readonly IConfiguration _configuration;
