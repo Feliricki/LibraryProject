@@ -16,7 +16,7 @@ namespace LibraryProjectAPI.Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _timer = new Timer(UpdateEntries, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            _timer = new Timer(UpdateEntries, null, TimeSpan.Zero, TimeSpan.FromDays(1));
             await Task.CompletedTask;
         }
 
