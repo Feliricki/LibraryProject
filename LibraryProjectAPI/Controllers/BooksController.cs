@@ -5,6 +5,7 @@ using LibraryProjectAPI.DTO.Books;
 using LibraryProjectAPI.Models;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,9 +18,91 @@ namespace LibraryProjectAPI.Controllers
     public class BooksController : ControllerBase
     {
         private ApplicationDbContext _dbContext;
-        public BooksController(ApplicationDbContext dbContext)
+        private UserManager<ApplicationUser> _userManager;
+
+        public BooksController(
+            ApplicationDbContext dbContext,
+            UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
+        }
+
+
+        [HttpPost(Name = "LeaveReview")]
+        [Authorize(Roles = $"{ApplicationRoles.Librarian}, {ApplicationRoles.User}")]
+        public async Task<IActionResult> LeaveReview(
+            int isbn,
+            [Range(1, 5, ErrorMessage = "Value is not within the acceptable range.")]
+            int review,
+            string userName)
+        {
+            var book = await _dbContext.Books
+                .Include(x => x.Reviews)
+                .FirstOrDefaultAsync(b => b.Isbn == isbn);
+
+            if (book is null)
+            {
+                return BadRequest("Invalid book requested.");
+            }
+
+            var findByUsername = await _userManager.FindByNameAsync(userName);
+            var findByEmail = await _userManager.FindByEmailAsync(userName);
+
+            var foundUser = findByUsername ?? findByEmail;
+
+            if (foundUser is null)
+            {
+                return BadRequest("User does not exists.");
+            }
+
+            // TODO: Finish this method
+            // See if there's already a score for this book from the user
+            bool prevScore = book.Reviews.Any(b => b.UserId == foundUser.Id);
+            if (prevScore)
+            {
+                var prevReview = book.Reviews.FirstOrDefault(b => b.UserId == foundUser.Id);
+                prevReview!.Score = review;
+                prevReview = foundUser.Reviews.FirstOrDefault(u => u.UserId == foundUser.Id);
+                prevReview!.Score = review;
+
+                return Ok(await _dbContext.SaveChangesAsync());
+            }
+
+            var newReview = new Reviews
+            {
+                Score = review
+            };
+
+            // WARNING: The users table needs to be checked to see if changes are being saved.
+            foundUser.Reviews.Add(newReview);
+            book.Reviews.Add(newReview);
+
+            var changes = await _dbContext.SaveChangesAsync();
+
+            return Ok(changes);
+        }
+
+        private async Task<long?> GetAverageReview(int isbn)
+        {
+            var book = await _dbContext.Books
+                .AsNoTracking()
+                .Include(x => x.Reviews)
+                .FirstOrDefaultAsync(b => b.Isbn == isbn);
+
+            if (book is null)
+            {
+                return null;
+            }
+
+            var reviews = book.Reviews;
+            if (reviews.Count == 0)
+            {
+                return 0;
+            }
+
+            long cummulativeScore = reviews.Aggregate(0, (prev, current) => prev + current.Score);
+            return cummulativeScore / reviews.Count;
         }
 
         [HttpPost(Name = "SetCheckout")]
@@ -61,7 +144,8 @@ namespace LibraryProjectAPI.Controllers
                 return Ok(changes);
 
 
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -82,7 +166,8 @@ namespace LibraryProjectAPI.Controllers
                 var changes = await _dbContext.SaveChangesAsync();
                 return Ok(changes);
 
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -116,7 +201,7 @@ namespace LibraryProjectAPI.Controllers
             }
         }
 
-        [HttpDelete(Name="RemoveBook")]
+        [HttpDelete(Name = "RemoveBook")]
         [Authorize(Roles = ApplicationRoles.Librarian)]
         public async Task<IActionResult> RemoveBook(int isbn)
         {
@@ -131,7 +216,8 @@ namespace LibraryProjectAPI.Controllers
                 var changes = await _dbContext.SaveChangesAsync();
                 return Ok(changes);
 
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -156,10 +242,41 @@ namespace LibraryProjectAPI.Controllers
 
                 return Ok(await source.ToListAsync());
 
-            } catch (Exception)
+            }
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        private static BooksDTO GetReviewHelper(Books book)
+        {
+            //var dto = book.Adapt<BooksDTO>(); 
+            var dto = new BooksDTO
+            {
+                Title = book.Title,
+                BookCoverUrl = book.BookCoverUrl,
+                Description = book.Description,
+                Author = book.Author,
+                Publisher = book.Publisher,
+                Available = book.Available,
+                DaysUntilAvailable = book.DaysUntilAvailable,
+                PublicationDate = book.PublicationDate,
+                Category = book.Category,
+                Isbn = book.Isbn,
+                PageCount = book.PageCount,
+                ReviewCount = book.Reviews.Count
+            };
+
+            if (book.Reviews.Count == 0)
+            {
+                // Prevent divide by zero errors
+                dto.ReviewScore = 0;
+                return dto;
+            }
+            var cumulativeScore = book.Reviews.Sum(b => b.Score);
+            dto.ReviewScore = cumulativeScore / book.Reviews.Count;
+            return dto;
         }
 
 
@@ -170,11 +287,12 @@ namespace LibraryProjectAPI.Controllers
             {
                 var book = await _dbContext.Books
                     .AsNoTracking()
-                    .Where(book => book.Isbn == isbn)
-                    .ProjectToType<BooksDTO>()
-                    .ToListAsync();
+                    .Include(b => b.Reviews)
+                    .FirstOrDefaultAsync(book => book.Isbn == isbn);
 
-                return Ok(book.First()) ?? throw new Exception("No Book Found");
+                if (book is null) throw new Exception("No Book Found");
+                var dto = GetReviewHelper(book);
+                return Ok(dto) ?? throw new Exception("No Book Found");
             }
             catch (Exception)
             {
@@ -203,7 +321,7 @@ namespace LibraryProjectAPI.Controllers
                     .AsNoTracking()
                     .ProjectToType<BooksDTO>();
 
-                return await ApiResult<BooksDTO>.CreateAsync(
+                var ret = await ApiResult<BooksDTO>.CreateAsync(
                     source,
                     pageIndex,
                     pageSize,
@@ -211,8 +329,37 @@ namespace LibraryProjectAPI.Controllers
                     sortOrder,
                     filterColumn,
                     filterQuery);
+
+
+                var isbns = ret.Data.Select(b => b.Isbn).ToHashSet();
+                Dictionary<int, Books> booksList = await _dbContext.Books
+                    .AsNoTracking()
+                    .Include(b => b.Reviews)
+                    .Where(b => isbns.Contains(b.Isbn))
+                    .ToDictionaryAsync(b => b.Isbn);
+
+                // Modify the return value to include review information such as the reviewCount and the reviewScore
+                foreach (var bookDto in ret.Data)
+                {
+                    if (booksList.TryGetValue(bookDto.Isbn, out var foundBook))
+                    {
+                        int count = foundBook.Reviews.Count;
+                        float sum = foundBook.Reviews.Sum(b => b.Score);
+                        if (count == 0)
+                        {
+                            bookDto.ReviewCount = 0;
+                            bookDto.ReviewScore = 0;
+                            continue;
+                        }
+
+                        bookDto.ReviewCount = count;
+                        bookDto.ReviewScore = sum / count;
+                    }
+                }
+
+                return Ok(ret);
             }
-            catch (Exception error)
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }

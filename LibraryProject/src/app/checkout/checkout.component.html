@@ -1,88 +1,98 @@
 <div class="editContainer">
 
   @if (book === undefined){
-    @if (finishedLoading){
-      <p>Book not found</p>
-    }@else {
-      <em>Loading ...</em>
-    }
+  @if (finishedLoading){
+  <p>Book not found</p>
+  }@else {
+  <em>Loading ...</em>
+  }
   }
   @else {
 
-    <mat-list>
+  <div class="descriptionContainer">
 
-      <mat-list-item>
-        <img matListItemAvatar [src]="book.bookCoverUrl">
-        <h4 matListItemTitle>Title: {{ book.title }}</h4>
+    <img matListItemAvatar [src]="book.bookCoverUrl">
+    <h4 matListItemTitle>Title: {{ book.title }}</h4>
 
-        <p matListItemLine>
-          Description: {{ book.description }}
-        </p>
+    <p>
+      Description: {{ book.description }}
+    </p>
 
-        <p matListItemLine>
-          Author: {{ book.author }}
-        </p>
-        <p matListItemLine>
-          Publisher : {{ book.publisher }}
-        </p>
-        <p matListItemLine>
-          Publication Date: {{ book.publicationDate | date:"fullDate" }}
-        </p>
-        <p matListItemLine>
-          Category: {{book.category}}
-        </p>
-        <p matListItemLine>
-          ISBN: {{book.isbn}}
-        </p>
-        <p matListItemLine>
-          Page Count: {{book.pageCount}}
-        </p>
+    <p>
+      Author: {{ book.author }}
+    </p>
+    <p>
+      Publisher : {{ book.publisher }}
+    </p>
+    <p>
+      Publication Date: {{ book.publicationDate | date:"fullDate" }}
+    </p>
+    <p>
+      Category: {{book.category}}
+    </p>
+    <p>
+      ISBN: {{book.isbn}}
+    </p>
+    <p>
+      Page Count: {{book.pageCount}}
+    </p>
 
-        @if (isAuthenticated()){
-          <button mat-flat-button matListItemLine (click)="setCheckoutStatus(true)">Checkout Book</button>
-        }
-        @if (isLibrarian()){
-          <br>
-          <button mat-flat-button matListItemLine (click)="setCheckoutStatus(false)">Checkin Book</button>
-        }
-
-      </mat-list-item>
-
-    </mat-list>
-
-    @if (isLibrarian() === true){
-      <div [formGroup]="editForm" class="form-container">
-
-        <mat-card>
-
-          <mat-card-title>
-            <h4>Edit Book:</h4>
-          </mat-card-title>
-
-          <mat-card-content>
-
-            <mat-form-field>
-              <mat-label>Edit Title: </mat-label>
-              <input matInput formControlName="title">
-            </mat-form-field>
-
-            <br>
-
-            <mat-form-field>
-              <mat-label>Edit: Description</mat-label>
-              <input matInput formControlName="description">
-            </mat-form-field>
-            <br>
-
-            <button mat-flat-button (click)="submitEdit()" [disabled]="editForm.invalid">Submit Edit</button>
-            <button mat-flat-button class="remove-button" (click)="deleteBook()">Remove Book</button>
-          </mat-card-content>
-
-
-        </mat-card>
-
-      </div>
+    @if (isAuthenticated()){
+    <button mat-flat-button (click)="setCheckoutStatus(true)">Checkout Book</button>
     }
+    @if (isLibrarian()){
+    <button mat-flat-button (click)="setCheckoutStatus(false)">Checkin Book</button>
+    }
+
+    <!-- TODO: Consider retrieving the current of the user if it already exists -->
+    <!-- I need to create a new branch for all of these changes -->
+    @if (isAuthenticated()){
+    <div class="reviewFormContainer">
+      <br>
+      <form [formGroup]="reviewForm">
+        <mat-form-field class="scoreForm">
+          <input matInput formControlName="score" type="number" />
+        </mat-form-field>
+        <button mat-flat-button [disabled]="Score.invalid" (click)="leaveReview()">Submit Review</button>
+      </form>
+    </div>
+    }
+  </div>
+
+
+  @if (isLibrarian() === true){
+  <div [formGroup]="editForm" class="form-container">
+
+    <mat-card>
+
+      <mat-card-title>
+        <h4>Edit Book:</h4>
+      </mat-card-title>
+
+      <mat-card-content>
+
+        <mat-form-field>
+          <mat-label>Edit Title: </mat-label>
+          <input matInput formControlName="title">
+        </mat-form-field>
+
+        <br>
+
+        <mat-form-field>
+          <mat-label>Edit: Description</mat-label>
+          <input matInput formControlName="description">
+        </mat-form-field>
+        <br>
+
+        <button mat-flat-button (click)="submitEdit()" [disabled]="editForm.invalid">Submit Edit</button>
+        <button mat-flat-button class="remove-button" (click)="deleteBook()">Remove Book</button>
+      </mat-card-content>
+
+
+    </mat-card>
+
+  </div>
+  }
 
 
   }

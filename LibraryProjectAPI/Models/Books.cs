@@ -47,7 +47,5 @@ public class Books
     public int PageCount { get; set; }
 
     // NOTE: The review serve as the parent of the relationship
-    public ICollection<Reviews>? Reviews { get; set; } = null!;
-
-    //public ICollection<ApplicationUser>? ApplicationUsers { get; set; } = null!;
+    public ICollection<Reviews> Reviews { get; set; } = [];
 }

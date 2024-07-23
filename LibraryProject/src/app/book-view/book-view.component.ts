@@ -15,7 +15,8 @@ import { MatInputModule } from '@angular/material/input';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { RouterLink, Router } from '@angular/router';
-import {AuthenticationService} from "../auth/authentication.service";
+import { AuthenticationService } from "../auth/authentication.service";
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 type BookColumns =
   "Title" |
@@ -30,7 +31,7 @@ type BookColumns =
     MatTableModule, MatTabsModule, MatListModule,
     MatIconModule, MatSortModule, MatPaginatorModule,
     MatFormFieldModule, MatInputModule, ReactiveFormsModule,
-    RouterLink,
+    RouterLink, MatTooltipModule
   ],
   templateUrl: './book-view.component.html',
   styleUrl: './book-view.component.css'
@@ -39,9 +40,10 @@ export class BookViewComponent implements OnInit {
 
   featuredBooks: BooksDto[] = [];
   tableBooks: BooksDto[] = [];
+  reviews: string[][] = [];
 
   readonly displayedColumns: string[] = [
-    "CoverImage", "Title", "Descriptions", "Author", "Availability"
+    "CoverImage", "Reviews", "Title", "Descriptions", "Author", "Availability"
   ];
 
   defaultPageIndex: number = 0;
@@ -90,6 +92,7 @@ export class BookViewComponent implements OnInit {
     );
   }
 
+
   addNewBook(){
     const today = new Date();
     console.log(this.newBookForm);
@@ -104,7 +107,9 @@ export class BookViewComponent implements OnInit {
       publicationDate: today,
       category: this.newBookForm.controls.category.value,
       isbn: 0,
-      pageCount:this.newBookForm.controls.pageCount.value
+      pageCount: this.newBookForm.controls.pageCount.value,
+      reviewCount: 0,
+      reviewScore: 0,
     }).subscribe({
       next: response =>{
         console.log("successfully added book");
@@ -223,6 +228,21 @@ export class BookViewComponent implements OnInit {
           this.paginator.pageSize = apiResult.pageSize;
 
           this.tableBooks = apiResult.data;
+
+          for (let book of this.tableBooks) {
+            const score = book.reviewScore;
+            const row: string[] = [];
+            for (let i = 0; i < 5; i++) {
+              if (score >= i + 1) {
+                row.push("star");
+              } else if (score > (i + 0.5) && score < i + 1) {
+                row.push("star_half");
+              } else {
+                row.push("star_border");
+              }
+            }
+            this.reviews.push(row);
+          }
         },
         error: err => {
           console.error(err);

@@ -3,7 +3,6 @@ using LibraryProjectAPI.DTO.Account;
 using LibraryProjectAPI.Models;
 using LibraryProjectAPI.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -64,6 +63,7 @@ namespace LibraryProjectAPI.Controllers
         {
             try
             {
+
                 if (!ModelState.IsValid)
                 {
                     throw new Exception(GetFirstModelStateError(ModelState));

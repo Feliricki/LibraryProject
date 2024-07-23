@@ -36,8 +36,14 @@ public class BooksDTO
     [JsonPropertyName("isbn")]
     public int Isbn { get; set; }
     
-    [JsonPropertyName("PageCount")]
+    [JsonPropertyName("pageCount")]
     public int PageCount { get; set; }
+
+    [JsonPropertyName("reviewCount")]
+    public int ReviewCount { get; set; }
+
+    [JsonPropertyName("reviewScore")]
+    public float ReviewScore { get; set; }
 
     public static BooksDTO BookToBookDto(Models.Books books)
     {
@@ -53,7 +59,19 @@ public class BooksDTO
             PublicationDate = books.PublicationDate,
             Category = books.Category,
             Isbn = books.Isbn,
-            PageCount = books.PageCount
+            PageCount = books.PageCount,
+            ReviewCount = books.Reviews.Count,
+            ReviewScore = GetAverageHelper(books)
         };
+    }
+
+    private static int GetAverageHelper(Models.Books books)
+    {
+        var cummulativeScore = books.Reviews.Aggregate(0, (prev, current) => prev + current.Score);
+        if (books.Reviews.Count == 0)
+        {
+            return 0;
+        }
+        return cummulativeScore / books.Reviews.Count;
     }
 }

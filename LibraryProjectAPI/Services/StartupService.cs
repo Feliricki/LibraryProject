@@ -29,10 +29,7 @@ namespace LibraryProjectAPI.Services
             await SetUpDatabase();
             await SeedDatabase();
         }
-
-        //private async Task CreateDatabase()
-        //{
-        //}
+        
 
         private async Task SeedDatabase()
         {
@@ -108,19 +105,19 @@ namespace LibraryProjectAPI.Services
             // Instantiate a default libarian
             if (await _userManager.FindByNameAsync(_configuration["DefaultUser:DefaultName"]!) == null)
             {
-                var libarian = new ApplicationUser
+                var librarian = new ApplicationUser
                 {
                     SecurityStamp = Guid.NewGuid().ToString(),
                     UserName = _configuration["DefaultUser:DefaultName"],
                     Email = _configuration["DefaultUser:DefaultEmail"]
                 };
 
-                var identityResult = await _userManager.CreateAsync(libarian, _configuration["DefaultUser:DefaultPassword"]!);
+                var identityResult = await _userManager.CreateAsync(librarian, _configuration["DefaultUser:DefaultPassword"]!);
                 if (identityResult.Succeeded)
                 {
                     userCreated++;
                 }
-                await _userManager.AddToRoleAsync(libarian, ApplicationRoles.Librarian);
+                await _userManager.AddToRoleAsync(librarian, ApplicationRoles.Librarian);
             }
             Console.WriteLine($"Created {userCreated} new users and {rolesCreated} new roles.");
         }

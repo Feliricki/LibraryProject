@@ -13,6 +13,17 @@ export class BooksServiceService {
 
   constructor(private http: HttpClient) { }
 
+  leaveReview(isbn: number, reviewScore: number, userName: string)
+    : Observable<number> {
+    let url = environment.baseUrl + "api/Books/LeaveReview";
+    let params = new HttpParams()
+      .set("isbn", isbn.toString())
+      .set("review", reviewScore.toString())
+      .set("userName", userName);
+
+    return this.http.post<number>(url, null, { params: params });
+  }
+
   setCheckoutStatus(isbn: number, checkout: boolean){
     let url = environment.baseUrl + "api/Books/SetCheckout";
     let params = new HttpParams()

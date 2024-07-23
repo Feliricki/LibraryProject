@@ -7,6 +7,7 @@ import { LoginResult } from "./login-result";
 import {SignupRequest} from "./signup-request";
 import {SignupResult} from "./signup-result";
 
+
 @Injectable({
   providedIn: 'root',
 })
@@ -14,18 +15,20 @@ export class AuthenticationService {
 
   token: string = "";
   readonly tokenKey: string = "tokenKey";
-
   readonly isLibrarianKey: string = "isLibrarian";
 
   private _authenticated: WritableSignal<boolean> = signal(false);
   public authenticated: Signal<boolean> = this._authenticated.asReadonly();
 
   private _isLibrarian: WritableSignal<boolean> = signal(false);
-  // public isLibrarian: Signal<boolean> = this._isLibrarian.asReadonly();
+
+  private _currentUser: WritableSignal<null | string> = signal(null);
+  public currentUser: Signal<null | string> = this._currentUser.asReadonly();
 
   private curTimeout?: number = undefined;
 
   constructor(private http: HttpClient) { }
+
 
   isAuthenticated(): boolean {
     const authenticated = this.getToken() !== null;
@@ -63,10 +66,11 @@ export class AuthenticationService {
           this.setToken(res.token);
           this.setRole(res);
           this._authenticated.set(true);
+          this._currentUser.set(request.username);
 
-          this.curTimeout = setTimeout(() => {
-            this.logout();
-          }, 1000 * 60 * 30);
+          // this.curTimeout = setTimeout(() => {
+          //   this.logout();
+          // }, 1000 * 60 * 30);
         }
       })
     );
@@ -80,10 +84,11 @@ export class AuthenticationService {
           this.setToken(res.token);
           this.setRole(res);
           this._authenticated.set(true);
+          this._currentUser.set(request.username);
 
-          this.curTimeout = setTimeout(() => {
-            this.logout();
-          }, 1000 * 60 * 30);
+          // this.curTimeout = setTimeout(() => {
+          //   this.logout();
+          // }, 1000 * 60 * 30);
         }
       })
     );
@@ -91,6 +96,7 @@ export class AuthenticationService {
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.isLibrarianKey);
     this._authenticated.set(false);
     this._isLibrarian.set(false);
   }

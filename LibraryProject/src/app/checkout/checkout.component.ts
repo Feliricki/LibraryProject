@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from "@angular/material/button";
+import { reviewFormValidator } from './reviewValidator';
 
 @Component({
   selector: 'app-checkout',
@@ -26,15 +27,20 @@ export class CheckoutComponent implements OnInit {
 
   book?: BooksDto;
   title: string = "";
+
   editForm = this.formBuilder.nonNullable.group({
     title: this.formBuilder.nonNullable.control(""),
     description: this.formBuilder.nonNullable.control(""),
   });
 
+  // TODO: Consider adding some custom validation.
+  reviewForm = this.formBuilder.nonNullable.group({
+    score: this.formBuilder.control(null as null | number, { validators: reviewFormValidator() })
+  });
+
   finishedLoading: boolean = false;
   constructor(
     private activatedRoute: ActivatedRoute,
-    private router: Router,
     private authService: AuthenticationService,
     private booksService: BooksServiceService,
     private formBuilder: FormBuilder
@@ -43,6 +49,10 @@ export class CheckoutComponent implements OnInit {
 
   ngOnInit() {
     this.getData();
+  }
+
+  get Score() {
+    return this.reviewForm.controls.score;
   }
 
   get Title() {
@@ -61,14 +71,30 @@ export class CheckoutComponent implements OnInit {
     return this.authService.isLibrarian();
   }
 
+  leaveReview(): void {
+    if (!this.book) return;
+    const user = this.authService.currentUser();
+    if (!user) return;
+    const score = this.reviewForm.controls.score.value;
+    if (score === null) return;
+    if (this.reviewForm.invalid) return;
+
+    this.booksService.leaveReview(this.book.isbn, score, user)
+      .subscribe({
+        next: changes => {
+          console.log(`Successfully made ${changes} changes when leaving a review.`);
+        },
+        error: err => console.error(err)
+      });
+  }
+
   setCheckoutStatus(checkout: boolean): void {
     if (!this.book) return;
     this.booksService.setCheckoutStatus(this.book.isbn, checkout)
       .subscribe({
         next: changes => {
-          if (checkout){
+          if (checkout) {
             console.log("Successfully checked out book with " + changes.toString() + " changes");
-            // this.router.navigate([this.activatedRoute.snapshot])
           } else {
             console.log(`Successfully checked int book with ${changes} changes`);
           }
@@ -109,7 +135,7 @@ export class CheckoutComponent implements OnInit {
       })
   }
 
-  getData(){
+  getData() {
     let idParams = this.activatedRoute.snapshot.paramMap.get("id");
     let id = idParams ? +idParams : 0;
     console.log("Current isbn is " + id.toString());

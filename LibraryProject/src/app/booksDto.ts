@@ -1,4 +1,4 @@
-﻿export interface BooksDto {
+export interface BooksDto {
   title: string;
   bookCoverUrl: string;
   description: string;
@@ -10,4 +10,8 @@
   category: string;
   isbn: number;
   pageCount: number;
+
+  // Review Fields
+  reviewCount: number;
+  reviewScore: number;
 }

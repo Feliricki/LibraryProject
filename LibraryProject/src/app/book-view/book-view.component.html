@@ -53,6 +53,20 @@
               </td>
             </ng-container>
 
+            <!-- Ratings Column -->
+            <ng-container matColumnDef="Reviews">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let row; let j = index;">
+                    @if (row.reviewCount === 0){
+                        No Reviews
+                    } @else {
+                        @for (icon of reviews[j]; track $index){
+                            <mat-icon>{{icon}}</mat-icon>
+                        }
+                    }
+                </td>
+            </ng-container>
+
             <!-- Title Column -->
             <ng-container matColumnDef="Title">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>

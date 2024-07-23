@@ -21,6 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     )
 );
 
+
 // INFO: Only the required length is different from the default
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
